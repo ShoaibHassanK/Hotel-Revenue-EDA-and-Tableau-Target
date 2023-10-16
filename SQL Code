@@ -1,0 +1,122 @@
+        -- Data Exploration and Desiging of Destination Table for Tableau Analysis
+
+USE Hotel_Revenue
+   
+ 
+            WITH CTE AS (
+                         SELECT *
+                         FROM dbo.['2018$']
+                         UNION
+                         SELECT *
+                         FROM dbo.['2019$']
+                         UNION
+                         SELECT *
+                         FROM dbo.['2020$']
+                         ) 
+
+
+
+                      SELECT arrival_date_year, hotel, ROUND(SUM((stays_in_week_nights + stays_in_weekend_nights) * adr), 2) AS Amount
+               INTO Yearly_Hotel_Category_Revenue
+               FROM CTE
+               GROUP BY arrival_date_year, hotel
+               ORDER BY Amount DESC;
+
+
+                      SELECT *
+               FROM dbo.Yearly_Hotel_Category_Revenue
+               ORDER BY Amount DESC;
+
+
+               WITH CTE AS (
+                       SELECT *
+                       FROM dbo.['2018$']
+                       UNION
+                       SELECT *
+                       FROM dbo.['2019$']
+                       UNION 
+                       SELECT *
+                       FROM dbo.['2020$']
+                           ) 
+
+                 SELECT C.arrival_date_year, C.hotel, ROUND(SUM(((C.stays_in_week_nights + C.stays_in_weekend_nights) * C.adr)*D.Discount),2) AS Amount
+             FROM CTE AS C
+             JOIN dbo.market_segment$ AS D
+             ON D.market_segment = C.market_segment
+             GROUP BY C.arrival_date_year, C.hotel
+             ORDER BY Amount DESC
+
+
+                 -- Consolidating Data into a Single Destination Table for Repeated Analysis:
+
+               WITH CTE AS (
+                         SELECT *
+                         FROM dbo.['2018$']
+                         UNION
+                         SELECT *
+                         FROM dbo.['2019$']
+                         UNION
+                         SELECT *
+                         FROM dbo.['2020$']
+                            ) 
+
+              SELECT *
+           INTO Hotel_data
+           FROM CTE
+
+
+             -- Analyzing Seasonal Trends by Exploring Monthly Bookings Over the Years:
+
+
+             SELECT arrival_date_month, SUM(stays_in_weekend_nights + stays_in_week_nights) AS total_night_stayed,
+	                ROUND(SUM((stays_in_weekend_nights + stays_in_week_nights)*adr),2) As Total_Revenue_before_disocunt
+             FROM Hotel_data
+             GROUP BY arrival_date_month
+            ORDER BY total_night_stayed DESC
+
+
+          -- Occupancy Rate of Weekends and Other Week Days:
+
+
+              SELECT ROUND(((SUM(stays_in_weekend_nights)/SUM(stays_in_weekend_nights + stays_in_week_nights))*100),2) AS Weekend_Occupancy_Rate, ROUND(((SUM(stays_in_week_nights)/SUM(stays_in_weekend_nights + stays_in_week_nights))*100),2) Weekday_Occupancy_Rate
+              FROM dbo.Hotel_data
+
+
+        -- Percentage of Repeated Guests:
+
+
+             SELECT ROUND((SUM(is_repeated_guest)/ COUNT(*))*100,2) AS Percentage_Repeated_guests
+             FROM dbo.Hotel_data
+
+
+      -- Segmentation of Reserved Room types:
+
+
+            SELECT DISTINCT(reserved_room_type), COUNT(*) AS Total_reservations
+            FROM dbo.Hotel_data
+            GROUP BY reserved_room_type
+            ORDER BY Total_reservations DESC
+
+  
+    -- Reservation segmented by Country
+
+            SELECT DISTINCT(country), COUNT(*) AS Total_reservations
+            FROM Hotel_data
+            GROUP BY country
+            ORDER BY Total_reservations DESC
+
+
+    
+    -- Final Destination Table for Tableau Visualizations
+
+
+	SELECT     hd.hotel AS Hotel_name, hd.arrival_date_year AS Year, hd.arrival_date_month AS month, hd.stays_in_week_nights AS Week_days, 
+	           hd.stays_in_weekend_nights AS Weekend_days, hd.reserved_room_type AS Room_type, hd.is_repeated_guest AS Repeat_guest, hd.required_car_parking_spaces AS Car_parking_required  ,hd.adr AS Daily_rate,
+			   ROUND(SUM((hd.stays_in_weekend_nights + hd.stays_in_week_nights)*hd.adr),2) AS Original_amount, ms.Discount AS Discount, 
+			   ROUND(SUM(((hd.stays_in_week_nights + hd.stays_in_weekend_nights) * hd.adr)*ms.Discount),2) AS Discounted_amount,   hd.country AS Country
+	FROM Hotel_data hd
+	JOIN dbo.market_segment$ AS ms
+	ON hd.market_segment = ms.market_segment	
+	GROUP BY hd.hotel, hd.arrival_date_year, hd.arrival_date_month, hd.adr,
+	         hd.stays_in_week_nights, hd.stays_in_weekend_nights,
+			 hd.reserved_room_type, hd.is_repeated_guest, hd.country, ms.Discount, hd.required_car_parking_spaces
