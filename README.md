@@ -13,12 +13,15 @@ As a data analyst, I undertook a project focused on hotel revenue trends. With a
 
 - **Tableau Target Design:** I structured the data into a target table suitable for Tableau visualization.
 
-  [Tableau Dashboard]([([https://docs.google.com/spreadsheets/d/1WNgqQg8GSmMCpgVypm8zv4ZYB9EOp9MaqzbdbMEvQhk/edit?usp=drive_link](https://public.tableau.com/views/HotelInsights_16946054953540/Dashboard?:language=en-US&:display_count=n&:origin=viz_share_link))]).
+[Tableau Dashboard](https://public.tableau.com/views/HotelInsights_16946054953540/Dashboard?:language=en-US&:display_count=n&:origin=viz_share_link)
+
 
 - **Data Exploration:** I delved into seasonal trends, occupancy rates, repeated guests, room type segmentation, and reservation by country.
 
 ## Dataset
-The dataset used for this project is available from [Hotel Data]([(https://docs.google.com/spreadsheets/d/1WNgqQg8GSmMCpgVypm8zv4ZYB9EOp9MaqzbdbMEvQhk/edit?usp=drive_link)]).
+
+The dataset used for this project is available from [Hotel Data](https://docs.google.com/spreadsheets/d/1WNgqQg8GSmMCpgVypm8zv4ZYB9EOp9MaqzbdbMEvQhk/edit?usp=drive_link)
+
 
 Feel free to explore the SQL scripts and the resulting data target for insights into hotel revenue trends. For recruitment or collaboration inquiries, please contact me.
 
